@@ -43,23 +43,23 @@
 
 <%
 	String cid = null;
-	Cookie [] cookies = request.getCookies();	// 쿠키는 여러개일 수 있기 때문에 배열로 받음. 만들어진 같은 폴더에서만 쓸 수 있음 - 파일이기 때문에
-												// 세션은 다른 폴더에서도 꺼내볼 수 있음. 왜냐면 서버에 저장되기 때문에
+	Cookie [] cookies = request.getCookies();	// 쿠키는 여러 개일 수 있기 때문에 배열로 받음. 쿠키는 세션과 달리 같은 폴더 안에서만 쓸 수 있음 - 임시 파일이기 때문이다.
+							// 세션은 다른 폴더에서도 꺼내볼 수 있음. 왜냐면 서버에 저장되기 때문이다.
 									
-	for(Cookie c : cookies){ 	// 모든 쿠키에 저장된 것을 반복함 - new Cookie("cid", id)
-		if(c.getName().equals("cid")){	// 우리가 보내준 것이랑 같은지
+	for(Cookie c : cookies){ 		// 모든 쿠키에 저장된 것을 반복하겠다. - new Cookie("cid", id)
+		if(c.getName().equals("cid")){	// 우리가(클라이언트?) 보내준 것이랑 같은지
 			cid = c.getValue();	// 실행이 안 되면 cid에 아무것도 안들어감
 		}
 	}
-	if(cid == null){	// null과 같다면 로그인이 되지 않은 것임
+	if(cid == null){	// null과 같다면 로그인이 되지 않은 것이다.
 %>		<script>
-			alert("로그인 후 사용가능 합니다.");
-			window.location="cookieForm.jsp";
+			alert("로그인 후 사용가능 합니다.");	// 안내창
+			window.location="cookieForm.jsp";	// 다시 쿠키폼으로 돌아감
 		</script>				
 <% } %>
 <h2>[<%=cid %>]님 어서오세용가리~~^^</h2>
 
-<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
+<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼타입은 : 인풋타입의 텍스트 버튼이랑 같은 의미 -->
 <button onclick="window.location='logout.jsp'">로그아웃</button>
 
 -----------------
