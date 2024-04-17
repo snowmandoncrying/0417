@@ -1,0 +1,84 @@
+# cookieForm.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookieForm.jsp</h1>
+
+<form action="cookiePro.jsp" method="post">
+	id : <input type="text" name="id" /> <br />
+	pw : <input type="text" name="pw" /> <br />
+		 <input type="submit" value="login" /> <br />
+</form>
+------------------------
+
+# cookiePro.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookiePro.jsp</h1>
+
+<%
+	String id = request.getParameter("id");
+	String pw = request.getParameter("pw");
+	
+	if(id.equals("java") && pw.equals("1234")){
+		// 쿠키 저장 - 내부객체가 아니기 때문에 객체를 생성해서 써야 한다. 쿠키는 자동로그인, 즉 로그인 정보를 저장할 때 사용한다. (네이버는 이 정보를 이틀 간격으로 삭제한다. 근데 이틀 안에 접속하면 다시 갱신됨)
+		Cookie cid = new Cookie("cid", id);
+		cid.setMaxAge(20);	// 쿠키 유효시간 설정, 쿠키는 삭제 개념이 없고 대신 유효기간이 있음 - 이건 20초 후 자동삭제하도록 설정한 것이다.
+		response.addCookie(cid);	// 요청을 보낸 클라이언트에게 쿠키를 보내줘야함 - 사용자에게 응답할 때 쿠키를 넣어주겠다!
+		response.sendRedirect("cookieMain.jsp");	// 메인 페이지로 이동
+	}else{	      // 로그인 정보가 다를 때 html 스크립트로 출력
+%>		<script>
+			alert("id/ pw 를 확인하세요.");  // 경고창을 띄워 "id/pw를 확인하세요." 라는 메시지를 표시한다.
+			history.go(-1);	  // 브라우저의 이전 페이지로 이동한다. history.go() 함수에 음수 값을 전달하면 뒤로가기와 동일한 동작을 함.
+		</script>	
+<% } %>
+-----------------
+
+# cookieMain.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookieMain.jsp</h1>
+
+<%
+	String cid = null;
+	Cookie [] cookies = request.getCookies();	// 쿠키는 여러개일 수 있기 때문에 배열로 받음. 만들어진 같은 폴더에서만 쓸 수 있음 - 파일이기 때문에
+												// 세션은 다른 폴더에서도 꺼내볼 수 있음. 왜냐면 서버에 저장되기 때문에
+									
+	for(Cookie c : cookies){ 	// 모든 쿠키에 저장된 것을 반복함 - new Cookie("cid", id)
+		if(c.getName().equals("cid")){	// 우리가 보내준 것이랑 같은지
+			cid = c.getValue();	// 실행이 안 되면 cid에 아무것도 안들어감
+		}
+	}
+	if(cid == null){	// null과 같다면 로그인이 되지 않은 것임
+%>		<script>
+			alert("로그인 후 사용가능 합니다.");
+			window.location="cookieForm.jsp";
+		</script>				
+<% } %>
+<h2>[<%=cid %>]님 어서오세용가리~~^^</h2>
+
+<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
+<button onclick="window.location='logout.jsp'">로그아웃</button>
+
+-----------------
+
+# cookieLogout.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>cookieLogout.jsp</h1>
+
+
+<%
+	String cie = null;
+	Cookie [] cookies = request.getCookies();
+	for(Cookie c : cookies){
+		if(c.getName().equals("cid")){
+			c.setMaxAge(0);
+			response.addCookie(c);
+		}
+	}
+	response.sendRedirect("cookieForm.jsp");
+%>
