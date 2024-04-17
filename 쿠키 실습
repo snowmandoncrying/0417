@@ -72,13 +72,19 @@
 
 
 <%
-	String cid = null;
-	Cookie [] cookies = request.getCookies();
-	for(Cookie c : cookies){
-		if(c.getName().equals("cid")){
-			c.setMaxAge(0);
-			response.addCookie(c);
+	String cid = null;	// 변수 cid를 선언하고 초기화합니다.
+	Cookie [] cookies = request.getCookies();	// 클라이언트로부터 받은 쿠키 배열을 가져옵니다.
+	for(Cookie c : cookies){	// 반복문을 사용하여 쿠키 배열을 순회합니다.
+		if(c.getName().equals("cid")){	// 쿠키의 이름이 "cid"인 경우를 찾습니다.
+			c.setMaxAge(0);	// 해당 쿠키의 유효 시간을 0으로 설정하여 삭제합니다.
+			response.addCookie(c);	// 삭제된 쿠키를 응답에 추가합니다.
 		}
 	}
-	response.sendRedirect("cookieForm.jsp");	// 로그아웃 한거니까 다시 쿠키폼.jsp페이지로 돌아감
-%>
+	response.sendRedirect("cookieForm.jsp");	// 사용자를 cookieForm.jsp 페이지로 리다이렉트합니다. 로그아웃 한거니까 다시 쿠키폼.jsp페이지로 돌아감
+%>	
+
+request.getCookies();: 클라이언트로부터 받은 모든 쿠키를 가져옵니다.
+for 루프: 가져온 쿠키 배열을 순회하면서 각 쿠키의 이름을 확인합니다. 
+이름이 "cid"인 경우 해당 쿠키의 유효 시간을 0으로 설정하여 삭제합니다.
+response.sendRedirect("cookieForm.jsp");: 
+마지막으로, 사용자를 cookieForm.jsp 페이지로 리다이렉트하여 로그아웃이 완료되었음을 알립니다.
