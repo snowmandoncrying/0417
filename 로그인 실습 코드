@@ -83,28 +83,29 @@
 
 
 <%
-//	String id = request.getParameter("id"); - 이거 안하려고 위에 jsp프로퍼티를 한거임 >> 이거 일일이 다 쓰면 귀찮음. 그래서 그냥 프로퍼티 해버리면 된다.
-//	String pw = request.getParameter("pw");
+	//	String id = request.getParameter("id"); - 이거 안하려고 위에 jsp프로퍼티를 한거임 >> 이거 일일이 다 쓰면 귀찮음. 그래서 그냥 프로퍼티 해버리면 된다.
+	//	String pw = request.getParameter("pw");
 	
-	// DB 확인 - 쿼리문 완성 > 실행하면 됨 - 쿼리문이 셀렉트니까 리절트셋으로 실행
-	Connection conn = OracleConnection.getConnection();	// 1,2단계 처리 - 자바 임포트
+	// DB 확인 - 쿼리문 완성 > 실행하면 됨 - 쿼리문이 셀렉트니까 실행할 땐 리절트셋으로
+	Connection conn = OracleConnection.getConnection();	// 1,2단계를 처리한 것 - 자바 임포트
 	String sql ="select count(*) from global_user where id=? and pw=?"; 
 	
 	PreparedStatement pstmt = conn.prepareStatement(sql);
-	pstmt.setString(1, id);
-	pstmt.setString(2, pw);
+	pstmt.setString(1, id);	// 물음표 1번 - id
+	pstmt.setString(2, pw);	// 물음표 2번 - pw
 	
-	ResultSet rs = pstmt.executeQuery();
+	ResultSet rs = pstmt.executeQuery();	// select 쿼리문이니까 실행할 땐 ResultSet 으로 불러와서 써야함
 	rs.next();
-	int result = rs.getInt(1);	// count - num이니까 int로 꺼내면 됨 - 결과가 0이거나 1이거나 - 1일때 세션 만들어주면 됨
-	rs.close();
+	int result = rs.getInt(1);	// count는 num 이니까 int로 꺼내면 된다 - 결과가 0이거나 1이거나 - 결과가 1일때 세션을 만들어주면 됨
+	
+	rs.close();	// 계속 실행되면 계속 값을 불러오는거니까 실행을 종료시켜줘야한다.
 	pstmt.close();
 	conn.close();
 	
-	if(result == 1){
+	if(result == 1){	// 결과가 1이면 세션을 만들어주겠다.
 		session.setAttribute("sid", id);
 		response.sendRedirect("main.jsp");
-	}else{
+	}else{		// 결과가 1이 아니면 아이디와 패스워드를 확인하라는 경고창을 띄우고 이전 페이지로 보내버림
 %>		<script>
 			alert("id / pw 를 확인하세요!!!");
 			history.go(-1);
