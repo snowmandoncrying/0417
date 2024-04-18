@@ -1,4 +1,4 @@
-# loginForm.jsp
+# loginForm.jsp (로그인 폼)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -11,7 +11,7 @@
 </form>
 --------------------
 
-# loginPro.jsp
+# loginPro.jsp (로그인 프로)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -29,12 +29,12 @@
 	}else{						// 로그인 실패 - 이 부분은 html 스크립트로 처리
 %>		<script>
 			alert("id/ pw 를 확인하세요.");	// 알림창 생성
-			history.go(-1);			// 그리고 다시 뒤로 가라 - id와 pw를 틀렸으니까 다시 로그인창으로 이동
+			history.go(-1);			// 그리고 다시 뒤로 가라 - id와 pw를 틀렸으니까 다시 로그인 페이지로 이동
 		</script>	
 <% } %>
 ----------------------------
 
-# main.jsp
+# main.jsp (메인 - 로그인 성공 시)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -43,144 +43,33 @@
 <%
 	// 서버에 저장된 세션 값 꺼내기 !!
 	String sid = (String)session.getAttribute("sid");	// 리턴타입 : 오브젝트 - 스트링으로 형변환 하고 저장해야함 - 세션값을 꺼내는 것
-	if(sid == null){	// null과 같다면 로그인이 안 된 것임 - 메인은 로그인이 되어야만 들어올 수 있는 페이지임
+	if(sid == null){	// sid가 null과 같다면 로그인이 안 된 것임 > 메인은 로그인을 성공해야만 들어올 수 있는 페이지
 %>		<script>
-			alert("로그인 후 사용 가능 합니다.");
-			window.location='loginForm.jsp'
+			alert("로그인 후 사용 가능 합니다.");	// 알림창
+			window.location='loginForm.jsp'	// 다시 로그인 폼.jsp로 이동?
 		</script>
-		
-		<!-- response.sendRedirect("loginForm.jsp");	// 로그인 폼으로 다시 보내줌 - 유효성 검사 - 메인을 호출하면 로그인폼으로 이동됨  -->
+					<!-- response.sendRedirect("loginForm.jsp");	// 로그인 폼으로 다시 보내줌 - 유효성 검사 - 메인을 호출하면 로그인폼으로 이동됨  -->
 <% } %>
-<h2>[<%=sid %>]님 어서오세용가리~~♡</h2>
+<h2>[<%=sid %>]님 어서오세용가리~~♡</h2>	// 로그인에 성공하면 메인 화면에 출력되는 것
 
-<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
+<button onclick="window.location='user.jsp'">회원정보</button>		<!-- 버튼태그 : 인풋타입 버튼이랑 같은 의미, 회원정보랑 로그아웃 클릭 탭을 만들어줌 -->
 <button onclick="window.location='logout.jsp'">로그아웃</button>
 ----------------------------
 
-# logout.jsp
+# logout.jsp (로그아웃)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <h1>/jsp/0417/logout.jsp</h1>	
 
 <%
-	// 세션 삭제 - 하나만 삭제
-	session.removeAttribute("sid");
-
-	// 클라이언트의 모든 세션 삭제 - 연결된 모든 세션 삭제 (로그아웃)
-	session.invalidate();
-	
-	response.sendRedirect("loginForm.jsp");	// 로그아웃하면 다시 폼으로 가도록 함
+	session.removeAttribute("sid");	// 세션 삭제 - 하나만 삭제
+	session.invalidate();		// 클라이언트의 모든 세션 삭제 - 연결된 모든 세션 삭제 (로그아웃)
+	response.sendRedirect("loginForm.jsp");	// 로그아웃하면 다시 로그인폼으로 되돌아가도록 함
 %>
 ------------------
-@ 쿠키
-	게임의 경우 게임창에서 로그인했던 방식 - 보안이 약해서 안쓰다가 
-	요즘은 핸드폰 자동 로그인 방식으로 사용
 
-
-# cookieForm.jsp
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<h1>/jsp/0417/cookieForm.jsp</h1>
-
-<form action="cookiePro.jsp" method="post">
-	id : <input type="text" name="id" /> <br />
-	pw : <input type="text" name="pw" /> <br />
-	<input type="submit" value="login" /> <br />
-</form>
-------------------------
-
-# cookiePro.jsp
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<h1>/jsp/0417/cookiePro.jsp</h1>
-
-<%
-	String id = request.getParameter("id");
-	String pw = request.getParameter("pw");
-	
-	if(id.equals("java") && pw.equals("1234")){
-		// 쿠키 저장 - 내부객체가 아니기 때문에 생성해서 써야 한다. 자동로그인, 로그인 저장할 때 사용하는 쿠키 (네이버는 이틀간격으로 삭제)
-		Cookie cid = new Cookie("cid", id);
-		cid.setMaxAge(20);	// 쿠키 유효시간 설정, 쿠키는 삭제 개념이 없고 유효기간이 있음 - 60초 후 자동삭제
-		response.addCookie(cid);	// 클라이언트에게 보내줘야함 - 사용자에게 응답할 때 쿠키를 넣어주겠다.
-		response.sendRedirect("cookieMain.jsp");	// 메인 페이지로 이동
-	}else{	
-%>		<script>
-			alert("id/ pw 를 확인하세요.");
-			history.go(-1);	
-		</script>	
-<% } %>
------------------
-
-# cookieMain.jsp
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<h1>/jsp/0417/cookieMain.jsp</h1>
-
-<%
-	String cid = null;
-	Cookie [] cookies = request.getCookies();	// 쿠키는 여러개일 수 있기 때문에 배열로 받음. 만들어진 같은 폴더에서만 쓸 수 있음 - 파일이기 때문에
-												// 세션은 다른 폴더에서도 꺼내볼 수 있음. 왜냐면 서버에 저장되기 때문에
-									
-	for(Cookie c : cookies){ 	// 모든 쿠키에 저장된 것을 반복함 - new Cookie("cid", id)
-		if(c.getName().equals("cid")){	// 우리가 보내준 것이랑 같은지
-			cid = c.getValue();	// 실행이 안 되면 cid에 아무것도 안들어감
-		}
-	}
-	if(cid == null){	// null과 같다면 로그인이 되지 않은 것임
-%>		<script>
-			alert("로그인 후 사용가능 합니다.");
-			window.location="cookieForm.jsp";
-		</script>				
-<% } %>
-<h2>[<%=cid %>]님 어서오세용가리~~^^</h2>
-
-<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
-<button onclick="window.location='logout.jsp'">로그아웃</button>
-
------------------
-
-# cookieLogout.jsp
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<h1>cookieLogout.jsp</h1>
-
-
-<%
-	String cie = null;
-	Cookie [] cookies = request.getCookies();
-	for(Cookie c : cookies){
-		if(c.getName().equals("cid")){
-			c.setMaxAge(0);
-			response.addCookie(c);
-		}
-	}
-	response.sendRedirect("cookieForm.jsp");
-%>
----------------------
-
-@@ 이걸 활용해서 만들기
-
-sql table - png 기본이미지
-
-create table global_user(
-    id varchar2(100) primary key,
-    pw varchar2(100) not null,
-    name varchar2(100),
-    birth date,
-    phone varchar2(100),
-    img varchar2(100) default 'defult.png',
-    reg date default sysdate   
-);
-
-
-----------
-# 로그인프로,jsp
+@ loginPro.jsp	(심화 버전 - JSP와 자바 DAO, DTO 연결 : DAO와 DTO 각각에 1,2단계 / 3,4,5단계 적어놓고 JSP와 연결한 것 - JSP파일마다 일일이 다 쓰면 귀찮으니까 그냥 불러와서 쓰면 됨)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -190,7 +79,7 @@ create table global_user(
 <h1>/jsp/global/user/loginPro.jsp</h1>
 
 <jsp:useBean id="dto" class="web.bean.dto.GlobalUserDTO" />
-<jsp:setProperty name="dto" property="*" />	<!-- 전달되는 모든 프로퍼티를 dto에 저장 > 사용하려면 꺼내 써야함 -->
+<jsp:setProperty name="dto" property="*" />	<!-- 전달되는 모든 프로퍼티를 dto에 저장 >> 사용하려면 꺼내 써야함 -->
 
 
 <%
