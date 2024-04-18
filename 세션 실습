@@ -20,15 +20,16 @@
 <%
 	String id = request.getParameter("id");
 	String pw = request.getParameter("pw");
-	if(id.equals("java") && pw.equals("1234")){
-		// 로그인 성공 - 세션이나 쿠키는 로그인이 성공했을 때 생성되어야 함
-		session.setAttribute("sid", id);	// 세션 값만 추가시켜주면 됨. 맵 타입이기에 키와 밸류가 들어감. 밸류엔 id,키에는 마음대로.
-											// 세션이 만들어지면 페이지 어디서든 겟 어트리뷰트로 어디서든 꺼내쓸 수 있다 - 전달할 필요가 없다
-		response.sendRedirect("main.jsp");	// 로그인에 성공하면 메인 페이지로 이동 (페이지 이동 방식: 리다이렉트-단순이동, 포워드-정보를 가지고/ 세션은 단순이동)
-	}else{	// 로그인 실패 - 스크립트로 처리
+
+	if(id.equals("java") && pw.equals("1234")){	// 아이디가 java 이고 비번이 1234 이면 로그인 성공! 세션이나 쿠키는 로그인이 성공했을 때 생성되어야 함
+		session.setAttribute("sid", id);	// 세션 값만 추가시켜주면 됨. 맵 타입이기에 키와 밸류가 들어감. 밸류엔 id, 키에는 마음대로. (sid로 설정)
+							// 세션이 만들어지면 페이지 어디서든 getAttribute() 메서드로 id와 pw를 꺼내쓸 수 있다 > 즉 전달할 필요가 없어짐
+		response.sendRedirect("main.jsp");	// 로그인에 성공하면 메인 페이지로 이동 
+							// (페이지 이동 방식 2가지 : 리다이렉트는 단순이동, 포워드는 정보를 가지고 이동) 세션은 리다이렉트 - 단순이동
+	}else{						// 로그인 실패 - 이 부분은 html 스크립트로 처리
 %>		<script>
-			alert("id/ pw 를 확인하세요.");
-			history.go(-1);	// 다시 뒤로 가라 - 틀렸으니까
+			alert("id/ pw 를 확인하세요.");	// 알림창 생성
+			history.go(-1);			// 그리고 다시 뒤로 가라 - id와 pw를 틀렸으니까 다시 로그인창으로 이동
 		</script>	
 <% } %>
 ----------------------------
