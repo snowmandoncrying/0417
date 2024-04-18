@@ -69,7 +69,7 @@
 %>
 ------------------
 
-@ loginPro.jsp	(심화 버전 - JSP와 자바 DAO, DTO 연결 : DAO와 DTO 각각에 1,2단계 / 3,4,5단계 적어놓고 JSP와 연결한 것 - JSP파일마다 일일이 다 쓰면 귀찮으니까 그냥 불러와서 쓰면 됨)
+@ loginPro.jsp	(심화 버전 - JSP와 자바 DAO, DTO 연결 : DAO와 DTO 각각에 1,2단계 / 3,4,5단계 적어놓고 JSP와 연결한 것 - JSP파일마다 단계별로 일일이 다 쓰면 귀찮으니까 그냥 불러와서 쓰면 됨)
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -83,7 +83,7 @@
 
 
 <%
-//	String id = request.getParameter("id"); - 이거 안하려고 위에 jsp프로퍼티를 한거임
+//	String id = request.getParameter("id"); - 이거 안하려고 위에 jsp프로퍼티를 한거임 >> 이거 일일이 다 쓰면 귀찮음. 그래서 그냥 프로퍼티 해버리면 된다.
 //	String pw = request.getParameter("pw");
 	
 	// DB 확인 - 쿼리문 완성 > 실행하면 됨 - 쿼리문이 셀렉트니까 리절트셋으로 실행
