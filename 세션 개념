@@ -29,7 +29,15 @@
   4. 세션의 모든 속성 삭제 - session 객체의 invalidate() 메소드 사용
   > session.invalidate()
 
+@ 세션을 사용한 회원인증
 
+# LogonDBBean (DB 처리반) - DB > id 값을 가지고 member 테이블에서 pwssword 값을 가져옴
+# 회원 인증 처리 (sessionMemberLoginOK.jsp) >로그온디비빈에 result를 리턴함
+# 회원 인증 폼 (sessionMemberLogin.jsp) - 회원 인증 처리에 입력된 회원정보를 줌. 
+  회원 인증에 실패할 경우 입력된 정보를 가지고 로그온디비빈 객체의 userCheck() 메소드 호출
+# 인증 검증 페이지 (sessionLoginConfirm.jsp) - 회원인증 폼에 인증되지 않은 사용자일 경우 값 리턴,
+  로그아웃 할 경우 로그아웃 객체에 값 리턴
+# 로그아웃 (sessionLogOut.jsp)
 
 
 
