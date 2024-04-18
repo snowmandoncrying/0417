@@ -1,0 +1,502 @@
+# loginForm.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/loginForm.jsp</h1>>
+
+<form action="loginPro.jsp" method="post">
+	id : <input type="text" name="id" /> <br />
+	pw : <input type="text" name="pw" /> <br />
+		 <input type="submit" name="login" /> <br />
+</form>
+--------------------
+
+# loginPro.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/loginPro.jsp</h1>
+
+<%
+	String id = request.getParameter("id");
+	String pw = request.getParameter("pw");
+	if(id.equals("java") && pw.equals("1234")){
+		// 로그인 성공 - 세션이나 쿠키는 로그인이 성공했을 때 생성되어야 함
+		session.setAttribute("sid", id);	// 세션 값만 추가시켜주면 됨. 맵 타입이기에 키와 밸류가 들어감. 밸류엔 id,키에는 마음대로.
+											// 세션이 만들어지면 페이지 어디서든 겟 어트리뷰트로 어디서든 꺼내쓸 수 있다 - 전달할 필요가 없다
+		response.sendRedirect("main.jsp");	// 로그인에 성공하면 메인 페이지로 이동 (페이지 이동 방식: 리다이렉트-단순이동, 포워드-정보를 가지고/ 세션은 단순이동)
+	}else{	// 로그인 실패 - 스크립트로 처리
+%>		<script>
+			alert("id/ pw 를 확인하세요.");
+			history.go(-1);	// 다시 뒤로 가라 - 틀렸으니까
+		</script>	
+<% } %>
+----------------------------
+
+# main.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/main.jsp</h1>
+
+<%
+	// 서버에 저장된 세션 값 꺼내기 !!
+	String sid = (String)session.getAttribute("sid");	// 리턴타입 : 오브젝트 - 스트링으로 형변환 하고 저장해야함 - 세션값을 꺼내는 것
+	if(sid == null){	// null과 같다면 로그인이 안 된 것임 - 메인은 로그인이 되어야만 들어올 수 있는 페이지임
+%>		<script>
+			alert("로그인 후 사용 가능 합니다.");
+			window.location='loginForm.jsp'
+		</script>
+		
+		<!-- response.sendRedirect("loginForm.jsp");	// 로그인 폼으로 다시 보내줌 - 유효성 검사 - 메인을 호출하면 로그인폼으로 이동됨  -->
+<% } %>
+<h2>[<%=sid %>]님 어서오세용가리~~♡</h2>
+
+<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
+<button onclick="window.location='logout.jsp'">로그아웃</button>
+----------------------------
+
+# logout.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/logout.jsp</h1>	
+
+<%
+	// 세션 삭제 - 하나만 삭제
+	session.removeAttribute("sid");
+
+	// 클라이언트의 모든 세션 삭제 - 연결된 모든 세션 삭제 (로그아웃)
+	session.invalidate();
+	
+	response.sendRedirect("loginForm.jsp");	// 로그아웃하면 다시 폼으로 가도록 함
+%>
+------------------
+@ 쿠키
+	게임의 경우 게임창에서 로그인했던 방식 - 보안이 약해서 안쓰다가 
+	요즘은 핸드폰 자동 로그인 방식으로 사용
+
+
+# cookieForm.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookieForm.jsp</h1>
+
+<form action="cookiePro.jsp" method="post">
+	id : <input type="text" name="id" /> <br />
+	pw : <input type="text" name="pw" /> <br />
+	<input type="submit" value="login" /> <br />
+</form>
+------------------------
+
+# cookiePro.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookiePro.jsp</h1>
+
+<%
+	String id = request.getParameter("id");
+	String pw = request.getParameter("pw");
+	
+	if(id.equals("java") && pw.equals("1234")){
+		// 쿠키 저장 - 내부객체가 아니기 때문에 생성해서 써야 한다. 자동로그인, 로그인 저장할 때 사용하는 쿠키 (네이버는 이틀간격으로 삭제)
+		Cookie cid = new Cookie("cid", id);
+		cid.setMaxAge(20);	// 쿠키 유효시간 설정, 쿠키는 삭제 개념이 없고 유효기간이 있음 - 60초 후 자동삭제
+		response.addCookie(cid);	// 클라이언트에게 보내줘야함 - 사용자에게 응답할 때 쿠키를 넣어주겠다.
+		response.sendRedirect("cookieMain.jsp");	// 메인 페이지로 이동
+	}else{	
+%>		<script>
+			alert("id/ pw 를 확인하세요.");
+			history.go(-1);	
+		</script>	
+<% } %>
+-----------------
+
+# cookieMain.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/cookieMain.jsp</h1>
+
+<%
+	String cid = null;
+	Cookie [] cookies = request.getCookies();	// 쿠키는 여러개일 수 있기 때문에 배열로 받음. 만들어진 같은 폴더에서만 쓸 수 있음 - 파일이기 때문에
+												// 세션은 다른 폴더에서도 꺼내볼 수 있음. 왜냐면 서버에 저장되기 때문에
+									
+	for(Cookie c : cookies){ 	// 모든 쿠키에 저장된 것을 반복함 - new Cookie("cid", id)
+		if(c.getName().equals("cid")){	// 우리가 보내준 것이랑 같은지
+			cid = c.getValue();	// 실행이 안 되면 cid에 아무것도 안들어감
+		}
+	}
+	if(cid == null){	// null과 같다면 로그인이 되지 않은 것임
+%>		<script>
+			alert("로그인 후 사용가능 합니다.");
+			window.location="cookieForm.jsp";
+		</script>				
+<% } %>
+<h2>[<%=cid %>]님 어서오세용가리~~^^</h2>
+
+<button onclick="window.location='user.jsp'">회원정보</button>	<!-- 버튼 : 인풋타입이랑 같은 의미 -->
+<button onclick="window.location='logout.jsp'">로그아웃</button>
+
+-----------------
+
+# cookieLogout.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>cookieLogout.jsp</h1>
+
+
+<%
+	String cie = null;
+	Cookie [] cookies = request.getCookies();
+	for(Cookie c : cookies){
+		if(c.getName().equals("cid")){
+			c.setMaxAge(0);
+			response.addCookie(c);
+		}
+	}
+	response.sendRedirect("cookieForm.jsp");
+%>
+---------------------
+
+@@ 이걸 활용해서 만들기
+
+sql table - png 기본이미지
+
+create table global_user(
+    id varchar2(100) primary key,
+    pw varchar2(100) not null,
+    name varchar2(100),
+    birth date,
+    phone varchar2(100),
+    img varchar2(100) default 'defult.png',
+    reg date default sysdate   
+);
+
+
+----------
+# 로그인프로,jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="web.bean.dao.OracleConnection" %>
+
+<h1>/jsp/global/user/loginPro.jsp</h1>
+
+<jsp:useBean id="dto" class="web.bean.dto.GlobalUserDTO" />
+<jsp:setProperty name="dto" property="*" />	<!-- 전달되는 모든 프로퍼티를 dto에 저장 > 사용하려면 꺼내 써야함 -->
+
+
+<%
+//	String id = request.getParameter("id"); - 이거 안하려고 위에 jsp프로퍼티를 한거임
+//	String pw = request.getParameter("pw");
+	
+	// DB 확인 - 쿼리문 완성 > 실행하면 됨 - 쿼리문이 셀렉트니까 리절트셋으로 실행
+	Connection conn = OracleConnection.getConnection();	// 1,2단계 처리 - 자바 임포트
+	String sql ="select count(*) from global_user where id=? and pw=?"; 
+	
+	PreparedStatement pstmt = conn.prepareStatement(sql);
+	pstmt.setString(1, id);
+	pstmt.setString(2, pw);
+	
+	ResultSet rs = pstmt.executeQuery();
+	rs.next();
+	int result = rs.getInt(1);	// count - num이니까 int로 꺼내면 됨 - 결과가 0이거나 1이거나 - 1일때 세션 만들어주면 됨
+	rs.close();
+	pstmt.close();
+	conn.close();
+	
+	if(result == 1){
+		session.setAttribute("sid", id);
+		response.sendRedirect("main.jsp");
+	}else{
+%>		<script>
+			alert("id / pw 를 확인하세요!!!");
+			history.go(-1);
+		</script>		
+<% } %> 
+
+-----------
+
+# login.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/global/user/login.jsp</h1>
+
+<form action="loginPro.jsp" method="post">
+	id : <input type="text" name="id" /> <br />
+	pw : <input type="text" name="pw" /> <br />
+		 <input type="submit" value="login" /> <br />
+</form>
+<a href="input.jsp">회원가입</a>
+-------------------
+
+# loginPro.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="web.bean.dao.OracleConnection" %>
+
+<h1>/jsp/global/user/loginPro.jsp</h1>
+
+<jsp:useBean id="dto" class="web.bean.dto.GlobalUserDTO" />
+<jsp:setProperty name="dto" property="*" />	<!-- 전달되는 모든 프로퍼티를 dto에 저장 : 사용하려면 꺼내 써야함 -->
+<jsp:useBean id="dao" class="web.bean.dao.GlobalUserDAO" />
+
+<%
+	int result = dao.loginCheck(dto); // dao를 호출해서 dto를 매개변수로 전달해줌
+	
+	if(result == 1){
+		session.setAttribute("sid", dto.getId());
+		response.sendRedirect("main.jsp");
+	}else{
+%>		<script>
+			alert("id / pw 를 확인하세요!");
+			history.go(-1);
+		</script>		
+<% } %> 
+------------------------
+
+# main.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/global/user/main.jsp</h1>
+
+<%
+	String sid = (String)session.getAttribute("sid");	
+	if(sid == null){	
+%>		<script>
+			alert("로그인 후 사용 가능 합니다.");
+			window.location='login.jsp';
+		</script>
+		
+<% } %>
+<h2>[<%=sid %>]님 어서오세용가리~~^^!!</h2>
+
+<button onclick="window.location='user.jsp'">회원정보</button>
+<button onclick="window.location='logout.jsp'">로그아웃</button>
+
+-------------------
+
+# logout.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>/jsp/0417/logout.jsp</h1>	
+
+<%
+	session.removeAttribute("sid");
+	session.invalidate();
+	response.sendRedirect("login.jsp");	
+%>
+
+------------------
+
+# GlobalUserDTO.java
+
+package web.bean.dto;
+import java.sql.Timestamp;
+public class GlobalUserDTO {
+   private String id;
+   private String pw;
+   private String name;
+   private String birth;
+   private String phone;
+   private String img;
+   private Timestamp reg;   
+   public void setId(String id) {   this.id = id;}
+   public String getId() {   return id; }
+   
+   public void setBirth(String birth) {      this.birth = birth;   }
+   public String getBirth() {      return birth;   }
+   public String getPw() {      return pw;   }
+   public void setPw(String pw) {      this.pw = pw;   }
+   public String getName() {      return name;   }
+   public void setName(String name) {      this.name = name;   }
+   public String getPhone() {      return phone;   }
+   public void setPhone(String phone) {      this.phone = phone;   }
+   public String getImg() {      return img;   }
+   public void setImg(String img) {      this.img = img;   }
+   public Timestamp getReg() {      return reg;   }
+   public void setReg(Timestamp reg) {      this.reg = reg;   }
+}
+
+------------------
+
+# GlobalUserDAO.java
+
+package web.bean.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import web.bean.dto.GlobalUserDTO;
+public class GlobalUserDAO {
+   private Connection conn = null;
+   private PreparedStatement pstmt = null;
+   private ResultSet rs = null;
+   private String sql = null;
+   // 3, 4, 5 단계 작업하는 class. 실행된 결과만 jsp로 넘길 예정
+   // 현재 전달된 파라미터의 정보는 DTO에 저장되어 있는 상태임 -> 메소드 매개변수로 데이터 받기
+   public int loginCheck(GlobalUserDTO dto) {	// 여기서 매개변수로 dto를 받아서 실행하게 됨
+      int result = 0;
+      try {
+         conn = OracleConnection.getConnection(); // 1, 2 단계
+         sql = "select count(*) from global_user where id=? and pw=?";
+         pstmt = conn.prepareStatement(sql);
+         pstmt.setString(1, dto.getId()); // dto에 있는 데이터를 꺼내서 대입 - 꺼내서 쓰는 것임 - 1번 물음표 2번 물음표에 각각 대입을 한 것
+         pstmt.setString(2, dto.getPw());
+         rs = pstmt.executeQuery();	// 셀렉트니까 쿼리로 실행
+         rs.next();
+         result = rs.getInt(1); 
+      }catch(Exception e){
+         e.printStackTrace();
+      }finally {
+         OracleConnection.close(rs, pstmt, conn);
+      }
+      return result;
+   }
+   public void userInput(GlobalUserDTO dto){
+	   try {
+		   conn = OracleConnection.getConnection();
+		   sql="insert into global_user(id, pw, name, birth, phone)"
+				   + "values(?,?,?,?,?)";
+		   pstmt.setString(1, dto.getId());
+		   pstmt.setString(2, dto.getPw());
+		   pstmt.setString(3, dto.getName());
+		   pstmt.setString(4, dto.getBirth());
+		   pstmt.setString(5, dto.getPhone());
+		   
+		   pstmt.executeUpdate();
+	   }catch(Exception e) {
+		   e.printStackTrace();
+	}finally {
+		OracleConnection.close(rs, pstmt, conn);
+		}
+	}
+}
+디에이오 다시
+package web.bean.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import web.bean.dto.GlobalUserDTO;
+
+public class GlobalUserDAO {
+   //3,4,5 단계
+   private Connection conn = null;
+   private PreparedStatement pstmt = null;
+   private ResultSet rs = null;
+   private String sql = null;
+   
+   public int loginCheck(GlobalUserDTO dto) {
+      int result = 0 ;
+      try {
+         conn = OracleConnection.getConnection(); // 1,2단계
+         sql = "select count(*) from global_user where id=? and pw=?";
+         pstmt = conn.prepareStatement(sql);
+         pstmt.setString(1,dto.getId());
+         pstmt.setString(2,dto.getPw());
+         rs = pstmt.executeQuery();
+         rs.next();
+         result = rs.getInt(1);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }finally {
+         OracleConnection.close(rs, pstmt, conn);
+      }
+      return result;
+   }
+   //회원가입
+   public void userInput(GlobalUserDTO dto) {
+      try {
+         conn = OracleConnection.getConnection();
+         sql="insert into global_user(id,pw,name,birth,phone)"+"values(?,?,?,?,?)";
+         pstmt = conn.prepareStatement(sql);
+         pstmt.setString(1,dto.getId());
+         pstmt.setString(2,dto.getPw());
+         pstmt.setString(3,dto.getName());
+         pstmt.setString(4,dto.getBirth());
+         pstmt.setString(5,dto.getPhone());
+         
+         pstmt.executeUpdate();
+      }catch(Exception e){
+         e.printStackTrace();
+      }finally {
+         OracleConnection.close(rs, pstmt, conn);
+      }
+   }
+}
+--------------------
+
+# input.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>input.jsp/ 회원가입</h1>
+
+<form action="inputPro.jsp" method="post">
+	id : <input type="text" name="id" /> <br />
+	pw : <input type="text" name="pw" /> <br />
+	name : <input type="text" name="name" /> <br />
+	birth : <input type="text" name="birth" /> <br />
+	phone : <input type="text" name="phone" /> <br />
+	
+		 <input type="submit" value="가입" />
+</form>
+-----------------
+
+# inputPro.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>inputPro.jsp</h1>
+<% request.setCharacterEncoding("UTF-8"); // post방식 인코딩 - 한글이 들어가야 하니까 %>	
+
+<jsp:useBean id="dto" class="web.bean.dto.GlobalUserDTO" />
+<jsp:setProperty name="dto" property="*" />
+<jsp:useBean id="dao" class="web.bean.dao.GlobalUserDAO" />
+<%
+	dao.userInput(dto);
+%>
+<script>
+	alert("가입 되었습니다.");
+	window.location="login.jsp";
+</script>
+---------------------
+# OracleConnection.java
+
+package web.bean.dao;
+
+import java.sql.*;
+
+public class OracleConnection {
+	public static Connection getConnection() {	// 연결을 해주는 메서드 - 미리 설정하면 편함 - 임포트만 해주면 됨
+		Connection conn = null;
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			String dbURL="jdbc:oracle:thin:@192.168.219.198:1521:orcl";
+			String user =  "scott3";
+			String dbpw = "tiger";
+			conn = DriverManager.getConnection(dbURL, user, dbpw);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return conn;
+	}
+	public static void close(ResultSet rs, PreparedStatement pstmt, Connection conn) { 			// 연결을 끊어주는 메서드
+		if(rs != null) { try{rs.close();} catch(SQLException s) { s.printStackTrace(); }}
+		if(pstmt != null) { try{pstmt.close();} catch(SQLException s) { s.printStackTrace(); }}
+		if(conn != null) { try{conn.close();} catch(SQLException s) { s.printStackTrace(); }}
+	}
+}
